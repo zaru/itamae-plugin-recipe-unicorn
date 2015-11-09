@@ -1,0 +1,85 @@
+#!/bin/sh
+
+export PATH=<%= node[:unicorn][:path] %>
+export RBENV_ROOT=<%= node[:unicorn][:rbenv_root] %>
+export RBENV_VERSION=<%= node[:unicorn][:ruby_ver] %>
+export RAILS_ENV=<%= node[:unicorn][:env] %>
+ENVIROMENT=<%= node[:unicorn][:env] %>
+NAME=unicorn
+APP_ROOT_DIR="<%= node[:unicorn][:app_root] %><%= node[:unicorn][:app_dir] %>"
+CONF="<%= node[:unicorn][:app_root] %><%= node[:unicorn][:conf_dir] %>"
+PID="<%= node[:unicorn][:app_root] %><%= node[:unicorn][:pid_dir] %>"
+USER=<%= node[:unicorn][:user] %>
+
+start()
+{
+if [ -e $PID ]; then
+echo "$NAME already started";
+exit 1;
+fi
+echo "start $NAME";
+cd $APP_ROOT_DIR
+su -c "$RBENV_ROOT/bin/rbenv exec bundle exec unicorn -E $ENVIROMENT -c $CONF -D" $USER
+}
+
+stop()
+{
+if [ ! -e $PID ]; then
+echo "$NAME not started";
+exit 1;
+fi
+echo "stop $NAME";
+su -c "kill -QUIT `cat ${PID}`" $USER
+su -c "rm -f $PID" $USER
+}
+
+force_stop()
+{
+if [ ! -e $PID ]; then
+echo "$NAME not started";
+exit 1;
+fi
+echo "stop $NAME";
+su -c "kill -TERM `cat ${PID}`" $USER
+su -c "rm -f $PID" $USER
+}
+
+reload()
+{
+if [ ! -e $PID ]; then
+echo "$NAME not started";
+start
+exit 0;
+fi
+echo "reload $NAME";
+su -c "kill -HUP `cat ${PID}`" $USER
+}
+
+restart()
+{
+stop
+start
+}
+
+case "$1" in
+start)
+start
+;;
+stop)
+stop
+;;
+force-stop)
+force_stop
+;;
+reload)
+reload
+;;
+restart)
+restart
+;;
+*)
+echo "Syntax Error: release [start|stop|force-stop|reload|restart]"
+;;
+esac
+
+exit
