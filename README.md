@@ -1,8 +1,9 @@
-# Itamae::Plugin::Recipe::Unicorn
+# Itamae::Plugin::Recipe::unicorn
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/itamae/plugin/recipe/unicorn`. To experiment with that code, run `bin/console` for an interactive prompt.
+Itamae recipe plugin for unicorn service script.
 
-TODO: Delete this and the text above, and describe your gem
+- unicorn service script
+- unicorn logrotate.d script
 
 ## Installation
 
@@ -22,15 +23,27 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Install
 
-## Development
+```ruby
+include_recipe "unicorn::service"
+include_recipe "unicorn::logrotate"
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```yaml
+unicorn:
+  path: /usr/local/rbenv/shims:/usr/local/rbenv/bin:$PATH
+  rbenv_root: /home/ec2-user/.rbenv
+  ruby_ver: 2.1.0
+  env: production
+  app_root: /var/www/www.example.com
+  app_dir: /current
+  conf_dir: /current/config/unicorn/production.rb
+  pid_dir: /shared/tmp/pids/unicorn.pid
+  user: ec2-user
+  log_rotate_interval: 12
+```
 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/itamae-plugin-recipe-unicorn.
-
