@@ -1,0 +1,15 @@
+<%= node[:unicorn][:app_root] %>/shared/log/*.log
+<%= node[:unicorn][:app_root] %>/log/*.log {
+daily
+rotate <%= node[:unicorn][:log_rotate_interval] %>
+missingok
+notifempty
+copytruncate
+compress
+create 0666 <%= node[:unicorn][:user] %> <%= node[:unicorn][:user] %>
+
+lastaction
+pid=<%= node[:unicorn][:app_root] %><%= node[:unicorn][:pid_dir] %>
+test -s $pid && kill -USR1 "$(cat $pid)"
+endscript
+}
